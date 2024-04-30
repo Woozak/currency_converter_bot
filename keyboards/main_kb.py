@@ -10,7 +10,4 @@ converter_button = InlineKeyboardButton(
     callback_data='converter_button'
 )
 
-main_kb = InlineKeyboardMarkup(
-    inline_keyboard=[[rates_button],
-                     [converter_button]]
-)
+main_kb = InlineKeyboardMarkup(inline_keyboard=[[rates_button, converter_button]])
