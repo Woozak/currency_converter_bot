@@ -1,9 +1,11 @@
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import Command, CommandStart, StateFilter
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup, default_state
 
 from keyboards.main_kb import main_kb
+
+from currency_functions import get_exchange_rates
 
 
 class FSMCurrencyConverter(StatesGroup):
@@ -30,3 +32,16 @@ async def help_command(message: Message):
              f'курсов всех валют, выраженных в российских рублях.\n\n'
              f'<b>Конвертер</b> позволяет преобразовать заданное количество денежных единиц из одной валюты в другую'
     )
+
+
+@router.callback_query(F.data == 'rates_button')
+async def rates_button_press(callback: CallbackQuery):
+    message_text = get_exchange_rates()
+
+    if message_text != callback.message.text:
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=main_kb
+        )
+
+    await callback.answer()
