@@ -2,10 +2,12 @@ from aiogram import F, Router
 from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup, default_state
+from aiogram.fsm.context import FSMContext
 
 from keyboards.main_kb import main_kb
-
+from keyboards.currencies_kb import currencies_kb
 from currency_functions import get_exchange_rates
+from currencies import currencies
 
 
 class FSMCurrencyConverter(StatesGroup):
@@ -25,7 +27,7 @@ async def start_command(message: Message):
     )
 
 
-@router.message(Command(commands='help'))
+@router.message(Command(commands='help'), StateFilter(default_state))
 async def help_command(message: Message):
     await message.answer(
         text=f'Кнопка <b>Курс</b> предоставит Вам актуальный перечень '
@@ -46,3 +48,12 @@ async def rates_button_press(callback: CallbackQuery):
         )
 
     await callback.answer()
+
+
+@router.callback_query(F.data == 'converter_button')
+async def converter_button_press(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        text='Выберите валюту, которую нужно конвертировать',
+        reply_markup=currencies_kb
+    )
+    await state.set_state(FSMCurrencyConverter.first_currency)
