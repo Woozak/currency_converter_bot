@@ -57,3 +57,25 @@ async def converter_button_press(callback: CallbackQuery, state: FSMContext):
         reply_markup=currencies_kb
     )
     await state.set_state(FSMCurrencyConverter.first_currency)
+
+
+@router.callback_query(F.data.in_(currencies), StateFilter(FSMCurrencyConverter.first_currency))
+async def select_first_currency(callback: CallbackQuery, state: FSMContext):
+    await state.update_data(first_currency=callback.data)
+
+    await callback.message.edit_text(
+        text='Выберите валюту, в которую нужно конвертировать первую выбранную валюту',
+        reply_markup=currencies_kb
+    )
+    await state.set_state(FSMCurrencyConverter.second_currency)
+
+
+@router.callback_query(F.data.in_(currencies), StateFilter(FSMCurrencyConverter.second_currency))
+async def select_second_currency(callback: CallbackQuery, state: FSMContext):
+    await state.update_data(second_currency=callback.data)
+
+    await callback.message.edit_text(
+        text='Введите количество',
+        reply_markup=currencies_kb
+    )
+    await state.set_state(FSMCurrencyConverter.quantity)
