@@ -6,14 +6,14 @@ from aiogram.fsm.context import FSMContext
 
 from keyboards.main_kb import main_kb
 from keyboards.currencies_kb import currencies_kb
-from currency_functions import get_exchange_rates
+from currency_functions import get_exchange_rates, currency_converter, is_number
 from currencies import currencies
 
 
 class FSMCurrencyConverter(StatesGroup):
-    first_currency = State()   # Состояние ожидания выбора конвертируемой валюты
+    first_currency = State()  # Состояние ожидания выбора конвертируемой валюты
     second_currency = State()  # Состояние ожидания выбора валюты, в которую необходимо конвертировать
-    quantity = State()         # Состояние ожидания ввода количества конвертируемой валюты
+    quantity = State()  # Состояние ожидания ввода количества конвертируемой валюты
 
 
 router = Router()
@@ -79,3 +79,18 @@ async def select_second_currency(callback: CallbackQuery, state: FSMContext):
         reply_markup=currencies_kb
     )
     await state.set_state(FSMCurrencyConverter.quantity)
+
+
+@router.message(is_number, StateFilter(FSMCurrencyConverter.quantity))
+async def enter_quality(message: Message, state: FSMContext):
+    await state.update_data(quantity=float(message.text))
+
+    data = await state.get_data()
+
+    await message.answer(text=currency_converter(
+            first=data['first_currency'],
+            second=data['second_currency'],
+            quantity=data['quantity']
+        ),
+        reply_markup=main_kb
+    )
