@@ -3,6 +3,14 @@ import requests
 from currencies import currencies
 
 
+def is_number(message):
+    value = message.text.replace(',', '.')
+    try:
+        return float(value) > 0
+    except ValueError:
+        return False
+
+
 def get_data():
     url = 'https://www.cbr-xml-daily.ru/daily_json.js'
 
@@ -34,6 +42,6 @@ def currency_converter(first, second, quantity):
 
     first_value = get_value(first, data)
     second_value = get_value(second, data)
-    result = round(first_value / second_value, 3) * quantity
+    result = round(first_value / second_value * quantity, 3)
 
     return f'{quantity} {currencies[first][0]} {first} = {result} {currencies[second][0]} {second}'
