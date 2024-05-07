@@ -103,4 +103,4 @@ async def enter_incorrect_quantity(message: Message):
 
 @router.message(~StateFilter(FSMCurrencyConverter.quantity))
 async def other_message(message: Message):
-    await message.answer(text='Пожалуйста, изпользуйте кнопки')
+    await message.answer(text='Пожалуйста, воспользуйтесь кнопками')
