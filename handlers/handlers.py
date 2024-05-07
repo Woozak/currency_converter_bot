@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import Command, CommandStart, StateFilter
+from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup, default_state
 from aiogram.fsm.context import FSMContext
@@ -19,12 +19,13 @@ class FSMCurrencyConverter(StatesGroup):
 router = Router()
 
 
-@router.message(CommandStart())
-async def start_command(message: Message):
+@router.message(Command(commands=['start', 'cancel']))
+async def start_and_cancel_commands(message: Message, state: FSMContext):
     await message.answer(
         text=f'Привет, <b>{message.from_user.first_name}</b>!\nЧем я могу помочь?',
         reply_markup=main_kb
     )
+    await state.set_state(default_state)
 
 
 @router.message(Command(commands='help'))
@@ -47,7 +48,6 @@ async def rates_button_press(callback: CallbackQuery):
             text=message_text,
             reply_markup=main_kb
         )
-
     await callback.answer()
 
 
