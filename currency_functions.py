@@ -14,7 +14,10 @@ def is_number(message):
 def get_data():
     url = 'https://www.cbr-xml-daily.ru/daily_json.js'
 
-    return requests.get(url).json()
+    result = requests.get(url).json()
+    result['Valute']['RUB'] = {"Nominal": 1, 'Value': 1}
+
+    return result
 
 
 def get_value(code, data):
