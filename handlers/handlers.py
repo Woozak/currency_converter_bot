@@ -74,16 +74,15 @@ async def select_first_currency(callback: CallbackQuery, state: FSMContext):
 async def select_second_currency(callback: CallbackQuery, state: FSMContext):
     await state.update_data(second_currency=callback.data)
 
-    await callback.message.edit_text(
-        text='Введите количество',
-        reply_markup=currencies_kb
-    )
+    await callback.message.answer(text='Введите количество')
+
     await state.set_state(FSMCurrencyConverter.quantity)
+    await callback.answer()
 
 
 @router.message(is_number, StateFilter(FSMCurrencyConverter.quantity))
 async def enter_quantity(message: Message, state: FSMContext):
-    await state.update_data(quantity=float(message.text))
+    await state.update_data(quantity=float(message.text.replace(',', '.')))
 
     data = await state.get_data()
 
@@ -98,5 +97,10 @@ async def enter_quantity(message: Message, state: FSMContext):
 
 
 @router.message(StateFilter(FSMCurrencyConverter.quantity))
-async def enter_incorrect_quantity(message: Message, state: FSMContext):
+async def enter_incorrect_quantity(message: Message):
     await message.answer(text='Пожалуйста, введите число')
+
+
+@router.message(~StateFilter(FSMCurrencyConverter.quantity))
+async def other_message(message: Message):
+    await message.answer(text='Пожалуйста, изпользуйте кнопки')

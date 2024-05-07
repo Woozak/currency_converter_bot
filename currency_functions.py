@@ -30,7 +30,7 @@ def get_exchange_rates():
         if code == 'RUB':
             continue
         value = round(get_value(code, data), 3)
-        rates.append(f'{name[0]} {code}  {value}')
+        rates.append(f'1 {name[0]} {code} = {value} RUB')
 
     result = '\n'.join(rates)
 
