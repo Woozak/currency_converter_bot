@@ -27,14 +27,15 @@ async def start_command(message: Message):
     )
 
 
-@router.message(Command(commands='help'), StateFilter(default_state))
-async def help_command(message: Message):
+@router.message(Command(commands='help'))
+async def help_command(message: Message, state: FSMContext):
     await message.answer(
         text=f'Кнопка <b>Курс</b> предоставит Вам актуальный перечень '
              f'курсов всех валют, выраженных в российских рублях.\n\n'
              f'<b>Конвертер</b> позволяет преобразовать заданное количество денежных единиц из одной валюты в другую',
         reply_markup=main_kb
     )
+    await state.set_state(default_state)
 
 
 @router.callback_query(F.data == 'rates_button')
