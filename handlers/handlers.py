@@ -19,7 +19,7 @@ class FSMCurrencyConverter(StatesGroup):
 router = Router()
 
 
-@router.message(CommandStart(), StateFilter(default_state))
+@router.message(CommandStart())
 async def start_command(message: Message):
     await message.answer(
         text=f'Привет, <b>{message.from_user.first_name}</b>!\nЧем я могу помочь?',
@@ -82,7 +82,7 @@ async def select_second_currency(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(is_number, StateFilter(FSMCurrencyConverter.quantity))
-async def enter_quality(message: Message, state: FSMContext):
+async def enter_quantity(message: Message, state: FSMContext):
     await state.update_data(quantity=float(message.text))
 
     data = await state.get_data()
@@ -94,3 +94,9 @@ async def enter_quality(message: Message, state: FSMContext):
         ),
         reply_markup=main_kb
     )
+    await state.set_state(default_state)
+
+
+@router.message(StateFilter(FSMCurrencyConverter.quantity))
+async def enter_incorrect_quantity(message: Message, state: FSMContext):
+    await message.answer(text='Пожалуйста, введите число')
